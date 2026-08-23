@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <ZmqWrapper/ZmqWrapper.h>
-// #include "../config/AppConfig.h"
 
 class Zserver
 {
@@ -16,10 +15,6 @@ public:
 
 public:
   ZmqWrapper zmq;
-
-private:
-  // AppConfig config;
-
 };
 
 #endif
