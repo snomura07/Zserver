@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  main:
+    restart: always
+    build: .
+    image: zserver_dev_img
+    environment:
+      - TZ=Asia/Tokyo
+
+    container_name: 'zserver_cont'
+    volumes:
+      - ../src:/var/opt/zserver/src
+    #   - ../../build:/home/nomura/build
+    #   - ../../bin:/opt/raptor/bin:rw
+    #   - ../../lib:/opt/raptor/lib:rw
+    #   - ../../script:/home/nomura/script
+    #   - ../../resource/thermal_zone0:/home/nomura/thermal_zone0
+    #   - ../../resource/image:/opt/raptor/image:rw
+    #   - ../../config:/opt/raptor/config:rw
+    #   - ../../log:/opt/raptor/log:rw
+    #   - ../../resource/msgs:/var/opt/msgs:rw
+
+    command: >
+      bash -c "
+        wait
+        bash
+      "
+    ports:
+      - 5555:5555
+    tty: true

@@ -1,0 +1,4 @@
+{
+    "modName" : "Zserver",
+    "healthCheckPort" : 5599
+}

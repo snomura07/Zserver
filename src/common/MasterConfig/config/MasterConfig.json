@@ -1,0 +1,37 @@
+{
+    "localhost" : "127.0.0.1",
+    "raptorIp"  : "100.64.1.200",
+    "subPort"   : 5555,
+    "pubPort"   : 5556,
+    "path":{
+        "config" : "/opt/raptor/config/",
+        "image"  : "/opt/raptor/image/",
+        "camera" : "/opt/raptor/image/camera/",
+        "log"    : "/opt/raptor/log/",
+        "bin"    : "/opt/raptor/bin/"
+    },
+    "api":{
+        "host" : "chat",
+        "port" : 5000
+    },
+    "chat":{
+        "topic":"CHATSERVER"
+    },
+    "zserver":{
+        "host" : "*",
+        "topic":"ZSERVER",
+        "port" : 5001
+    },
+    "processMonitor":{
+        "topic":"PROCESS_MONITOR"
+    },
+    "shutdown":{
+        "topic":"SHUTDOWN"
+    },
+    "raptorLoggerApi":{
+        "endpoint":"prpjme5ltk.execute-api.ap-northeast-1.amazonaws.com",
+        "path":{
+            "setLog":"/dev/set_log"
+        }
+    }
+}

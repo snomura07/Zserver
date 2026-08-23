@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.5)
+
+set(PROTOC qemu-arm -L /usr/arm-linux-gnueabi /usr/local/bin/protoc)
+set(PROTOBUF_PREFIX protobuf-)
+file(GLOB_RECURSE targets *.proto)
+set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+
+add_subdirectory(example)
+add_subdirectory(CpuTemperatureMsg)
+add_subdirectory(CounterMsg)
+add_subdirectory(CamMsg)
+add_subdirectory(ChatServerMsg)
+add_subdirectory(ProcessMonitorMsg)
+add_subdirectory(GpioServerMsg)
+add_subdirectory(MasterLineMsg)
