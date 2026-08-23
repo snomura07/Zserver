@@ -28,7 +28,7 @@ bool Zserver::run()
     auto res = zmq.pollMessage(rMsg, -1);
     print("Received message: ", rMsg);
 
-    std::string sMsg = "Hello, Zserver!";
+    std::string sMsg = "[Hello, Zserver] " + rMsg;
     zmq.sendMessage(sMsg);
   }
 
