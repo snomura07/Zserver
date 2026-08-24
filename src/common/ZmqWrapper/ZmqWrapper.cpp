@@ -9,17 +9,17 @@ ZmqWrapper::ZmqWrapper(){}
 
 ZmqWrapper::~ZmqWrapper()
 {
-    for (const auto& pair : socketMap) {
-        if (pair.second) {
+    for (const auto& pair : sessionMap) {
+        if (pair.second.socket) {
             int linger = 0;
-            zmq_setsockopt(pair.second, ZMQ_LINGER, &linger, sizeof(linger));
-            zmq_close(pair.second);
+            zmq_setsockopt(pair.second.socket, ZMQ_LINGER, &linger, sizeof(linger));
+            zmq_close(pair.second.socket);
         }
     }
 
-    for (const auto& pair : contextMap) {
-        if (pair.second) {
-            zmq_ctx_destroy(pair.second);
+    for (const auto& pair : sessionMap) {
+        if (pair.second.context) {
+            zmq_ctx_destroy(pair.second.context);
         }
     }
 }
@@ -28,22 +28,19 @@ void ZmqWrapper::registerSession(std::string ip, int port, zmqPatternEnum patter
 {
     std::string address = "tcp://" + ip + ":" + std::to_string(port);
 
-    // this->context = zmq_ctx_new();
-    // this->socket  = zmq_socket (this->context, pattern);
-    // this->topic   = topic;
-
-    this->contextMap[topic]  = zmq_ctx_new();
-    this->socketMap[topic]   = zmq_socket (this->contextMap[topic], pattern);
+    sessionMap[topic].context = zmq_ctx_new();
+    sessionMap[topic].socket  = zmq_socket (sessionMap[topic].context, pattern);
+    sessionMap[topic].topic   = topic;
 
     if(pattern == SUBSCRIBE){
-        zmq_setsockopt(this->socketMap[topic], ZMQ_SUBSCRIBE, topic.c_str(), topic.length());
+        zmq_setsockopt(sessionMap[topic].socket, ZMQ_SUBSCRIBE, topic.c_str(), topic.length());
     }
 
     if(ip == "*"){
-        zmq_bind(this->socketMap[topic], address.c_str());
+        zmq_bind(sessionMap[topic].socket, address.c_str());
     }
     else{
-        zmq_connect(this->socketMap[topic], address.c_str());
+        zmq_connect(sessionMap[topic].socket, address.c_str());
     }
 }
 
@@ -51,37 +48,32 @@ void ZmqWrapper::registerSession(std::string ip, int port, zmqPatternEnum patter
 {
     std::string address = "tcp://" + ip + ":" + std::to_string(port);
 
-    // this->context            = zmq_ctx_new();
-    // this->socket             = zmq_socket (this->context, pattern);
-    // this->topic              = topic;
-
-    this->contextMap[topic]  = zmq_ctx_new();
-    this->socketMap[topic]   = zmq_socket (this->contextMap[topic], pattern);
-    this->callbackMap[topic] = callback;
+    sessionMap[topic].context  = zmq_ctx_new();
+    sessionMap[topic].socket   = zmq_socket (sessionMap[topic].context, pattern);
+    sessionMap[topic].topic    = topic;
+    sessionMap[topic].callback = callback;
 
     if(pattern == SUBSCRIBE){
-        zmq_setsockopt(this->socketMap[topic], ZMQ_SUBSCRIBE, topic.c_str(), topic.length());
+        zmq_setsockopt(sessionMap[topic].socket, ZMQ_SUBSCRIBE, topic.c_str(), topic.length());
     }
 
     if(ip == "*"){
-        zmq_bind (this->socketMap[topic], address.c_str());
+        zmq_bind (sessionMap[topic].socket, address.c_str());
     }
     else{
-        zmq_connect(this->socketMap[topic], address.c_str());
+        zmq_connect(sessionMap[topic].socket, address.c_str());
     }
 }
-
 
 int ZmqWrapper::pollMessage(std::string &msg, int timeout)
 {
     std::vector<zmq_pollitem_t> items;
     {
-        for(const auto& pair : socketMap) {
-            zmq_pollitem_t item = { pair.second, 0, ZMQ_POLLIN, 0 };
+        for(const auto& pair : sessionMap) {
+            zmq_pollitem_t item = { pair.second.socket, 0, ZMQ_POLLIN, 0 };
             items.push_back(item);
         }
     }
-std::cerr << "Polling for messages... itemSize: " << items.size() << std::endl;
     auto res = zmq_poll (items.data(), items.size(), timeout);
 
     // timeout
@@ -93,7 +85,6 @@ std::cerr << "Polling for messages... itemSize: " << items.size() << std::endl;
         return -1;
     }
 
-std::cerr << "Messages received." << std::endl;
     for(const auto& item : items) {
         if (item.revents & ZMQ_POLLIN) {
             zmq_msg_t message;
@@ -112,8 +103,10 @@ std::cerr << "Messages received." << std::endl;
                 std::string message_content = data.substr(delimiter_pos + 1);
                 msg = message_content;
 
-                if (auto it = callbackMap.find(topic); it != callbackMap.end()) {
-                    it->second(msg, topic);
+                if (auto it = sessionMap.find(topic); it != sessionMap.end()) {
+                    if (it->second.callback) {
+                        it->second.callback(msg, topic);
+                    }
                 } else {
                     // std::cerr << "Callback function not found for topic: " << topic << std::endl;
                 }
@@ -130,7 +123,7 @@ std::cerr << "Messages received." << std::endl;
 int ZmqWrapper::sendMessage(std::string msg, std::string topic)
 {
     std::string taggedMsg = topic + '$' + msg;
-    int len = zmq_send(this->socketMap[topic], taggedMsg.c_str(), taggedMsg.size(), 0);
+    int len = zmq_send(sessionMap[topic].socket, taggedMsg.c_str(), taggedMsg.size(), 0);
 
     if (len == -1) {
         // std::cerr << "Failed to send message." << std::endl;

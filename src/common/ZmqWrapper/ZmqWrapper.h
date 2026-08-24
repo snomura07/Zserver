@@ -15,8 +15,15 @@ public:
         SUBSCRIBE = ZMQ_SUB,
         PUBLISH = ZMQ_PUB
     };
-
     using CallbackFunction = std::function<void(std::string, std::string)>;
+
+private:
+    struct zqmSessionInfo{
+        void* context;
+        void* socket;
+        std::string topic;
+        CallbackFunction callback;
+    };
 
 public:
     ZmqWrapper();
@@ -38,9 +45,7 @@ public:
     int sendMessage(std::string msg, std::string topic);
 
 private:
-    std::map<std::string, void*> contextMap;
-    std::map<std::string, void*> socketMap;
-    std::map<std::string, CallbackFunction> callbackMap;
+    std::map<std::string, zqmSessionInfo> sessionMap;
 };
 
 #endif
