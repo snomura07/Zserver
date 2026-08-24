@@ -35,13 +35,11 @@ public:
 
     int pollMessage(std::string &msg, int timeout);
 
-    int sendMessage(std::string msg);
-
-    void* context;
-    void* socket;
-    std::string topic;
+    int sendMessage(std::string msg, std::string topic);
 
 private:
+    std::map<std::string, void*> contextMap;
+    std::map<std::string, void*> socketMap;
     std::map<std::string, CallbackFunction> callbackMap;
 };
 

@@ -22,13 +22,25 @@ bool Zserver::run()
 						ZmqWrapper::zmqPatternEnum::REPLY,
 						"HANDSHAKE",
 						[this](std::string rMsg, std::string topic) {
-							std::string sMsg = "[Zserver received] " + rMsg;
-							zmq.sendMessage(sMsg);
+							print("Received message: ", rMsg, " on topic: ", topic);
+							std::string sMsg = "[Zserver received1] " + rMsg;
+							zmq.sendMessage(sMsg, topic);
+						});
+
+	zmq.registerSession("*",
+						5551,
+						ZmqWrapper::zmqPatternEnum::REPLY,
+						"GGG",
+						[this](std::string rMsg, std::string topic) {
+							print("Received message: ", rMsg, " on topic: ", topic);
+							std::string sMsg = "[Zserver received2] " + rMsg;
+							zmq.sendMessage(sMsg, topic);
 						});
 
   while(isRunning){
     std::string rMsg = "";
     auto res = zmq.pollMessage(rMsg, -1);
+	print("res: ", res);
   }
 
   return isRunning;

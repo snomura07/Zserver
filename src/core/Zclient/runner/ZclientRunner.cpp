@@ -9,13 +9,13 @@ int main(int argc, char *argv[])
 {
     ZmqWrapper zmq;
     zmq.registerSession("127.0.0.1",
-                        5550,
+                        5551,
                         ZmqWrapper::zmqPatternEnum::REQUEST,
-                        "HANDSHAKE"
+                        "GGG"
                       );
 
     std::string smsg = "ggg";
-    zmq.sendMessage(smsg);
+    zmq.sendMessage(smsg, "GGG");
 
     auto res = zmq.pollMessage(smsg, -1);
     print("Received message: ", smsg);
