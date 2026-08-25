@@ -26,7 +26,8 @@ ZmqWrapper::~ZmqWrapper()
 
 void ZmqWrapper::registerSession(std::string ip, int port, zmqPatternEnum pattern, std::string topic)
 {
-    std::string address = "tcp://" + ip + ":" + std::to_string(port);
+    std::string portStr = (port == 0) ? "*" : std::to_string(port);
+    std::string address = "tcp://" + ip + ":" + portStr;
 
     sessionMap[topic].context = zmq_ctx_new();
     sessionMap[topic].socket  = zmq_socket (sessionMap[topic].context, pattern);
@@ -46,23 +47,8 @@ void ZmqWrapper::registerSession(std::string ip, int port, zmqPatternEnum patter
 
 void ZmqWrapper::registerSession(std::string ip, int port, zmqPatternEnum pattern, std::string topic, const CallbackFunction& callback)
 {
-    std::string address = "tcp://" + ip + ":" + std::to_string(port);
-
-    sessionMap[topic].context  = zmq_ctx_new();
-    sessionMap[topic].socket   = zmq_socket (sessionMap[topic].context, pattern);
-    sessionMap[topic].topic    = topic;
+    registerSession(ip, port, pattern, topic);
     sessionMap[topic].callback = callback;
-
-    if(pattern == SUBSCRIBE){
-        zmq_setsockopt(sessionMap[topic].socket, ZMQ_SUBSCRIBE, topic.c_str(), topic.length());
-    }
-
-    if(ip == "*"){
-        zmq_bind (sessionMap[topic].socket, address.c_str());
-    }
-    else{
-        zmq_connect(sessionMap[topic].socket, address.c_str());
-    }
 }
 
 int ZmqWrapper::pollMessage(std::string &msg, int timeout)
