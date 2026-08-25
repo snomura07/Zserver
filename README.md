@@ -1,6 +1,9 @@
 # Zserver
 
 ## ver2.0
+# 2.2
+- proxyサーバーを前提としたPUBLISH送信機能を実装
+
 # 2.1
 - Requestサーバーを複数持てるように修正
 
