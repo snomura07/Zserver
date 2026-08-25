@@ -1,4 +1,11 @@
 # Zserver
+## ver3.0
+# 3.2
+- loggerサーバー実装
+# 3.1
+- MasterConfig実装
+# 3.0
+- 子プロセスとのハンドシェイクver1.0
 
 ## ver2.0
 # 2.2
