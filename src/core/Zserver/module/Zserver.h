@@ -12,6 +12,7 @@ public:
   ~Zserver();
 
   bool run();
+  void callback(std::string msg, std::string topic);
 
 public:
   ZmqWrapper zmq;

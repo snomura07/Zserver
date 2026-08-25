@@ -7,16 +7,20 @@
 
 int main(int argc, char *argv[])
 {
+
+
     ZmqWrapper zmq;
     zmq.registerSession("127.0.0.1",
-                        5551,
+                        5559,
                         ZmqWrapper::zmqPatternEnum::REQUEST,
-                        "GGG"
+                        "PRIVATE_SESSION9"
                       );
 
-    std::string smsg = "ggg";
-    zmq.sendMessage(smsg, "GGG");
+    std::string smsg = "mokemoke";
+    print("Sending message: ", smsg);
+    zmq.sendMessage(smsg, "PRIVATE_SESSION9");
 
+    print("Polling for response...");
     auto res = zmq.pollMessage(smsg, -1);
     print("Received message: ", smsg);
     msleep(100);
