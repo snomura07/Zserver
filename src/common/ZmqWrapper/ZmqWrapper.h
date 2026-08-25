@@ -41,6 +41,7 @@ public:
                          const CallbackFunction& callback);
 
     int pollMessage(std::string &msg, int timeout);
+    int pollMessage(std::string &msg, int timeout, std::string topic);
 
     int sendMessage(std::string msg, std::string topic);
 

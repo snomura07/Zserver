@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     std::thread pollThread([&zmq](){
         while(true){
             std::string rMsg = "";
-            auto res = zmq.pollMessage(rMsg, -1);
+            auto res = zmq.pollMessage(rMsg, -1, "ZSERVER_PUB_SESSION");
             print("Received message: ", rMsg);
         }
     });
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     zmq.sendMessage(smsg, "PRIVATE_SESSION9");
 
     print("Polling for response...");
-    auto res = zmq.pollMessage(smsg, -1);
+    auto res = zmq.pollMessage(smsg, -1, "PRIVATE_SESSION9");
     print("Received message: ", smsg);
     msleep(100);
 
